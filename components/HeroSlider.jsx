@@ -69,13 +69,9 @@ export default function HeroSlider({ movies }) {
   )
 
   //find first trailer for the trailer videos
-  const trailer =
-    trailerData?.results?.find(
+  const trailer = trailerData?.results?.find(
       (video) => video.site === 'YouTube' && video.type === 'Trailer',
-    ) ||
-    trailerData?.results?.find(
-      (video) => video.site === 'YouTube' && video.type === 'Teaser',
-    )
+  ) 
 
   //build youtube embed URL for trailer if found
   const trailerUrl = trailer
