@@ -8,11 +8,25 @@ import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 import Link from "next/link";
 import { Star } from "lucide-react";
+import useSWR from "swr";
+import TrailerModal from "./TrailerModal";
+
+//fetch data from url and return as JSON, if request fails throw error
+const fetcher = (url) => {
+    fetch(url).then((res) => {
+        if(!res.ok) {
+            throw new Error("Failed to fetch data")
+        }
+        return res.json()
+    })
+}
 
 export default function HeroSlider({movies}) {
 
     const [currentSlide, setCurrentSlide] = useState(0) //to track current slide index
     const [swiperInstance, setSwiperInstance] = useState(null) //to track the slide nav
+    const [isModalOpen, setIsModalOpen] = useState(false) //to show or hide trailer modal
+    const [selectedMedia, setSelectedMedia] = useState(null) //to store selected media to display trailer 
 
     //create a function to get the media title
     const getMediaTitle = (media) => {
@@ -47,6 +61,31 @@ export default function HeroSlider({movies}) {
             swiperInstance.slideToLoop(index)
             setCurrentSlide(index)
         }
+    }
+    //fetche trailer videos for the selected media using SWR
+    const {data: trailerData, error} = useSWR(
+        selectedMedia ? `https://api.themoviedb.org/3/${selectedMedia.media_type}/${selectedMedia.id}/videos?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=en_US` : null,
+        fetcher
+    )
+
+    //find first trailer for the trailer videos
+    const trailer = trailerData?.results?.find(
+        (video) => video.site === "YouTube" && video.type === "Trailer"
+    )
+
+    //build youtube embed URL for trailer if found
+    const trailerUrl = trailer ? `https://www.youtube.com/embed/${trailer.key}?autoplay=1` : null ;
+
+    //open trailer modal and set selected media
+    const openModal = (media) => {
+        setIsModalOpen(true)
+        setSelectedMedia(media)
+    }
+
+    //close trailer modal and clear selected media
+    const closeModal = (media) => {
+        setIsModalOpen(false)
+        setSelectedMedia(null)
     }
 
     return (
@@ -94,7 +133,10 @@ export default function HeroSlider({movies}) {
                                             </>
                                         )}
                                     </p>
-                                    <button className={`mt-5 sm:mt-8 inline-block bg-red-500 text-white px-4 py-2 
+                                    <button 
+                                     onClick={() => openModal(media)}
+                                     disabled={!media.id}
+                                     className={`mt-5 sm:mt-8 inline-block bg-red-500 text-white px-4 py-2 
                                      sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-lg font-semibold hover:bg-red-400 
                                      transition text-sm sm:text-base md:text-base ${
                                         !media.id ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
@@ -121,6 +163,13 @@ export default function HeroSlider({movies}) {
                     ))}
                 </div>
             )}
+
+            <TrailerModal 
+             isOpen={isModalOpen} 
+             onClose={closeModal} 
+             trailerUrl={trailerUrl} 
+             title={selectedMedia ? getMediaTitle(selectedMedia) : "Trailer"}
+            />
         </section>
     )
 }
