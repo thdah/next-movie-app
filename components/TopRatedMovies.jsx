@@ -28,7 +28,7 @@ export default async function TopRatedMovies() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-500 mb-4">
                 Top Rated Movies
             </h2>
-            <div className="flex overflow-x-auto pb-4 gap-13">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
                 {movies.length > 0 ? (
                     movies.map((movie) => <Card key={movie.id} media={movie} />)
                 ) : (

@@ -28,7 +28,7 @@ export default async function TopRatedTvSeries() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-500 mb-4">
                 Top Rated TV Series
             </h2>
-            <div className="flex overflow-x-auto pb-4 gap-13">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
                 {series.length > 0 ? (
                     series.map((item) => <Card key={item.id} media={item} />)
                 ) : (
