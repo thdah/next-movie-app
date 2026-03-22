@@ -84,9 +84,9 @@ export default function MoviesPage() {
         return series.filter((show) => {
             const date = new Date(show.first_air_date || "")
             return (
-                (genre === "all" || movie.genre_ids.includes(Number(genre))) && 
-                (language === "all" || movie.original_language === language) &&
-                (rating === "all" || movie.vote_average >= Number(rating)) &&
+                (genre === "all" || show.genre_ids.includes(Number(genre))) && 
+                (language === "all" || show.original_language === language) &&
+                (rating === "all" || show.vote_average >= Number(rating)) &&
                 (!yearRange.gte || date >= new Date(yearRange.gte)) &&
                 (!yearRange.lte || date <= new Date(yearRange.lte))
             )
